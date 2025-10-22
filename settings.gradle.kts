@@ -22,6 +22,8 @@ dependencyResolutionManagement {
 rootProject.name = "GymTimerApp"
 include(":app")
 include(":wearapp")
-include(":shared")
 include(":multiplatform:stopwatch")
 include(":multiplatform:gymtimer")
+include(":shared:connectivity")
+include(":shared:persistent:api")
+include(":shared:persistent:room")

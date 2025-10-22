@@ -2,14 +2,15 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+    id("kotlin-parcelize")
 }
 
 android {
-    namespace = "com.example.wearapp"
+    namespace = "com.example.gymtimerapp"
     compileSdk = 35
 
     defaultConfig {
-        applicationId = "com.example.wearapp"
+        applicationId = "com.example.gymtimerapp"
         minSdk = 31
         targetSdk = 35
         versionCode = 1
@@ -78,5 +79,10 @@ dependencies {
     implementation(libs.koin.android.compose)
 
     implementation("androidx.compose.material3:material3:1.3.2")
+
+    implementation(project(":shared:connectivity"))
+
+    implementation(project(":shared:persistent:api"))
+    implementation(project(":shared:persistent:room"))
 
 }

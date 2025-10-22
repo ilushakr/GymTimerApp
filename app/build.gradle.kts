@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+    id("kotlin-parcelize")
 }
 
 android {
@@ -50,6 +51,8 @@ dependencies {
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
     implementation(libs.play.services.wearable)
+    implementation(libs.androidx.appcompat)
+    implementation(libs.material)
 //    implementation(libs.androidx.compose.material)
 //    implementation(libs.androidx.compose.foundation)
 //    implementation(libs.androidx.wear.tooling.preview)
@@ -73,4 +76,16 @@ dependencies {
     implementation(project(":multiplatform:gymtimer"))
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.7.3")
 
+    val nav_version = "2.9.5"
+
+    implementation("androidx.navigation:navigation-compose:$nav_version")
+
+    implementation(libs.koin.android)
+    implementation(libs.koin.android.compose)
+    implementation("androidx.compose.material:material-navigation:1.9.3")
+
+
+    implementation(project(":shared:connectivity"))
+    implementation(project(":shared:persistent:api"))
+    implementation(project(":shared:persistent:room"))
 }

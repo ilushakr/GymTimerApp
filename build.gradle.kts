@@ -6,4 +6,8 @@ plugins {
     alias(libs.plugins.kotlin.multiplatform) apply false
     alias(libs.plugins.android.kotlin.multiplatform.library) apply false
     alias(libs.plugins.jetbrains.kotlin.jvm) apply false
+    alias(libs.plugins.android.library) apply false
+
+    id("com.google.devtools.ksp") version "2.2.20-2.0.4" apply false
+//    id("androidx.room") version "2.8.2" apply false
 }
