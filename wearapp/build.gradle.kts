@@ -71,9 +71,12 @@ dependencies {
 
 
     implementation("com.google.android.horologist:horologist-composables:0.6.17")
-    implementation("com.google.android.horologist:horologist-compose-layout:0.6.17")
+    implementation(libs.horologist.compose.layout)
 
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.7.3") // Use the latest stable version
+
+    implementation("androidx.compose.material:material-icons-core:1.7.8")
+// For core icons
 
     implementation(libs.koin.android)
     implementation(libs.koin.android.compose)

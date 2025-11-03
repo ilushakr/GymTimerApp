@@ -31,6 +31,8 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
+import com.example.gymtimerapp.R
+import com.example.shared.connectivity.data.ConnectionRepositoryImpl
 
 class DataLayerListenerService : WearableListenerService() {
 
@@ -76,13 +78,11 @@ class DataLayerListenerService : WearableListenerService() {
     override fun onMessageReceived(messageEvent: MessageEvent) {
 
         when (messageEvent.path) {
-            START_ACTIVITY_PATH -> {
-                val r = WorkoutDataModel.fromByteArray(messageEvent.data)
-                r
+            ConnectionRepositoryImpl.START_ACTIVITY_PATH -> {
                 startActivity(
                     Intent(this, MainActivity::class.java)
                         .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                        .putExtra("fhjkd", WorkoutDataModel.fromByteArray(messageEvent.data))
+                        .putExtra(getString(R.string.workout_model_extra), WorkoutDataModel.fromByteArray(messageEvent.data))
                 )
             }
         }
@@ -97,7 +97,6 @@ class DataLayerListenerService : WearableListenerService() {
     companion object {
         private const val TAG = "DataLayerService"
 
-        private const val START_ACTIVITY_PATH = "/start-activity"
         private const val DATA_ITEM_RECEIVED_PATH = "/data-item-received"
         const val COUNT_PATH = "/count"
         const val IMAGE_PATH = "/image"

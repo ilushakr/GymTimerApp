@@ -9,5 +9,5 @@ data class ExercisePersistentModel(
     val restDuration: Duration,
     val finishWorkRemainingDuration: Duration = Duration.ZERO,
     val finishRestRemainingDuration: Duration = Duration.ZERO,
-    val uuid: String
+    val uuid: String,
 )

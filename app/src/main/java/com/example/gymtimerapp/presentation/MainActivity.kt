@@ -8,50 +8,16 @@ import android.util.Log
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.expandVertically
-import androidx.compose.animation.shrinkVertically
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.imePadding
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.navigation.ModalBottomSheetLayout
-import androidx.compose.material.navigation.bottomSheet
-import androidx.compose.material.navigation.rememberBottomSheetNavigator
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.TextFieldValue
-import androidx.compose.ui.unit.dp
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
-import androidx.navigation.NavType
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
-import androidx.navigation.compose.dialog
-import androidx.navigation.compose.rememberNavController
-import androidx.navigation.navArgument
-import com.example.gymtimerapp.navigation.NavigationManager
-import com.example.gymtimerapp.navigation.Screens
-import com.example.gymtimerapp.presentation.deleteexercise.DeleteExerciseScreen
-import com.example.gymtimerapp.presentation.mainscreen.MainScreen
-import com.example.gymtimerapp.presentation.newexercise.NewExerciseScreenBottomSheet
-import com.example.gymtimerapp.presentation.newworkout.NewWorkoutScreenBottomSheet
-import com.example.gymtimerapp.presentation.savedexerciselist.SavedExerciseListScreen
-import com.example.gymtimerapp.presentation.savedworkoutlist.SavedWorkoutListScreen
+import com.example.gymtimerapp.presentation.navigationhost.NavigationHostScreen
+import com.example.gymtimerapp.presentation.theme.ui.GymTimerAppTheme
 import com.example.gymtimerapp.wearableutils.WatchConnectionManager
 import com.example.presistent.api.PersistentWorkoutManager
-import com.example.shared.connectivity.data.HandheldConnectionRepository
 import com.google.android.gms.tasks.OnFailureListener
 import com.google.android.gms.tasks.OnSuccessListener
 import com.google.android.gms.tasks.Tasks
@@ -69,15 +35,12 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.inject
-import org.koin.androidx.compose.koinViewModel
 import java.nio.charset.StandardCharsets
 import kotlin.random.Random
-
 
 private
 const val TAG = "DataSender"
@@ -211,154 +174,6 @@ class MainActivity : ComponentActivity(), MessageClient.OnMessageReceivedListene
             })
     }
 
-    @Composable
-    private fun Content() {
-        val viewModel = koinViewModel<MainViewModel>()
-
-        val state by viewModel.connectionState.collectAsStateWithLifecycle()
-
-        val bottomSheetNavigator = rememberBottomSheetNavigator()
-        val navController = rememberNavController(bottomSheetNavigator)
-
-        LaunchedEffect(viewModel) {
-            viewModel.navigationEvent.collectLatest { event ->
-                when (event) {
-                    is NavigationManager.NavigationEvent.NavigateToScreen -> {
-                        navController.navigate(event.route)
-                    }
-
-                    is NavigationManager.NavigationEvent.NavigateUp -> {
-//                        navController.currentBackStackEntry?.savedStateHandle.set()
-                        navController.popBackStack()
-//                        navController.popBackStack()
-                    }
-                }
-            }
-        }
-
-        Column(
-            modifier = Modifier.fillMaxSize(),
-        ) {
-
-            AnimatedVisibility(
-                visible = state == HandheldConnectionRepository.ConnectionState.Disconnected,
-                enter = expandVertically(),
-                exit = shrinkVertically()
-            ) {
-                Text(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 32.dp, vertical = 8.dp)
-                        .background(Color.Red, RoundedCornerShape(8.dp))
-                        .padding(16.dp),
-                    text = "Wearables is disconnected. Please check connection again",
-                    color = Color.White
-                )
-            }
-
-            ModalBottomSheetLayout(
-                modifier = Modifier
-                    .imePadding()
-                    .fillMaxWidth(),
-                bottomSheetNavigator = bottomSheetNavigator,
-                sheetShape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp)
-            ) {
-                NavHost(
-                    navController = navController,
-                    startDestination = viewModel.startDestination
-                ) {
-                    composable(Screens.MainScreen.route) {
-                        MainScreen()
-//                        MainScreenOld(
-//                            onAddClick = { navController.navigate("my_bottom_sheet") },
-//                            onCardClick = { navController.navigate("my_bottom_sheet") }
-//                        )
-                    }
-
-                    composable(Screens.SavedWorkoutListScreen.route) {
-                        SavedWorkoutListScreen()
-//                        MainScreenOld(
-//                            onAddClick = { navController.navigate("my_bottom_sheet") },
-//                            onCardClick = { navController.navigate("my_bottom_sheet") }
-//                        )
-                    }
-
-                    composable(Screens.SavedExerciseListScreen.route) {
-                        SavedExerciseListScreen()
-                    }
-
-                    dialog(
-                        route = Screens.DeleteExerciseScreen.route + "/{uuid}",
-                        arguments = listOf(
-                            navArgument("uuid") { type = NavType.StringType }
-                        )
-                    ) { entry ->
-                        entry.arguments?.getString("uuid")?.let { uuid ->
-                            DialogWrapper {
-                                DeleteExerciseScreen(uuid)
-                            }
-                        }
-                    }
-
-                    bottomSheet(Screens.NewExerciseScreen.route) {
-                        BottomSheetWrapper(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .imePadding()
-                        ) {
-                            NewExerciseScreenBottomSheet()
-                        }
-                    }
-
-                    bottomSheet(Screens.NewWorkoutScreen.route) {
-                        BottomSheetWrapper(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .imePadding()
-                        ) {
-                            NewWorkoutScreenBottomSheet()
-                        }
-                    }
-                }
-            }
-        }
-
-//                val navController = rememberNavController()
-//
-//                NavHost(
-//                    modifier = Modifier.fillMaxSize(),
-//                    navController = navController,
-//                    startDestination = Screens.NewExerciseScreen.route
-//                ) {
-//                    composable(route = Screens.NewExerciseScreen.route) {
-//                        NewExerciseScreen()
-//                    }
-////                    composable(
-////                        route = Screens.WeatherScreen.route + "/{weatherArgs}",
-////                        arguments = listOf(
-////                            navArgument("weatherArgs") {
-////                                type = NavType.StringType
-////                            }
-////                        )
-////                    ) { entry ->
-////                        entry.arguments?.getString("weatherArgs")?.let { args ->
-////                            WeatherInfoScreen(
-////                                viewModel = daggerViewModel {
-////                                    component.getWeatherViewModel()
-////                                },
-////                                weatherArgs = args,
-////                                onNavigate = { event ->
-////                                    when (event) {
-////                                        is UiEvent.PopBackStack -> navController.popBackStack()
-////                                        else -> Unit
-////                                    }
-////                                }
-////                            )
-////                        }
-////                    }
-//                }
-    }
-
     private var wearableDeviceConnected: Boolean = false
     private val wearableAppCheckPayload = "AppOpenWearable"
 
@@ -380,8 +195,8 @@ class MainActivity : ComponentActivity(), MessageClient.OnMessageReceivedListene
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            MaterialTheme {
-                Content()
+            GymTimerAppTheme(dynamicColor = false) {
+                NavigationHostScreen()
 //                val scope = rememberCoroutineScope()
 //
 //                val viewModel = koinViewModel<MainViewModel>()

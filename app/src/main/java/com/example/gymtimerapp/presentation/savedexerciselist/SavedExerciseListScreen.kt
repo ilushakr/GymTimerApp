@@ -43,9 +43,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.example.gymtimerapp.presentation.theme.ui.GymTimerAppTheme
 import com.example.presistent.api.ExercisePersistentModel
 import org.koin.androidx.compose.koinViewModel
 import kotlin.time.Duration
+import kotlin.time.Duration.Companion.minutes
+import kotlin.time.Duration.Companion.seconds
 
 @Composable
 fun SavedExerciseListScreen() {
@@ -229,21 +232,21 @@ private fun LazyListState.isScrollingUp(): Boolean {
 @Preview
 @Composable
 private fun ContentPreview() {
-    MaterialTheme {
+    GymTimerAppTheme {
         Content(
             modifier = Modifier.fillMaxSize(),
-//            items = List(100) {
-//                ExercisePersistentModel(
-//                    name = "Pull ups",
-//                    numberOfSets = 6,
-//                    workDuration = 1.minutes + 40.seconds,
-//                    restDuration = 1.minutes,
-//                    finishWorkRemainingDuration = 10.seconds,
-//                    finishRestRemainingDuration = 15.seconds,
-//                    uuid = ""
-//                )
-//            },
-            items = emptyList(),
+            items = List(100) {
+                ExercisePersistentModel(
+                    name = "Pull ups",
+                    numberOfSets = 6,
+                    workDuration = 1.minutes + 40.seconds,
+                    restDuration = 1.minutes,
+                    finishWorkRemainingDuration = 10.seconds,
+                    finishRestRemainingDuration = 15.seconds,
+                    uuid = ""
+                )
+            },
+//            items = emptyList(),
             onAddClick = {},
             onItemClick = {},
         )

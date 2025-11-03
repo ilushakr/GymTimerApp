@@ -1,40 +1,36 @@
 package com.example.gymtimerapp.presentation
 
 import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
 import android.util.Log
-import android.view.View
 import android.view.WindowManager
-import android.widget.ScrollView
-import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.Arrangement
+import androidx.activity.viewModels
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material3.Button
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.wear.compose.foundation.lazy.AutoCenteringParams
-import androidx.wear.compose.foundation.lazy.ScalingLazyColumn
-import androidx.wear.compose.foundation.lazy.itemsIndexed
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
+import androidx.wear.compose.foundation.lazy.TransformingLazyColumn
+import androidx.wear.compose.foundation.lazy.rememberTransformingLazyColumnState
 import androidx.wear.compose.material.Text
 import androidx.wear.compose.material.TimeTextDefaults
-import androidx.wear.compose.material3.MaterialTheme
-import com.example.stopwatch.StopWatch
+import androidx.wear.compose.material3.Button
+import androidx.wear.compose.material3.ListHeader
+import androidx.wear.compose.material3.ScreenScaffold
+import androidx.wear.compose.navigation.SwipeDismissableNavHost
+import androidx.wear.compose.navigation.composable
+import androidx.wear.compose.navigation.rememberSwipeDismissableNavController
+import com.example.gymtimerapp.R
 import com.example.gymtimerapp.presentation.theme.GymTimerAppTheme
 import com.example.shared.connectivity.data.WearableConnectionRepository
 import com.example.shared.connectivity.data.WorkoutDataModel
-import com.google.android.gms.wearable.CapabilityClient
+import com.example.stopwatch.StopWatch
 import com.google.android.gms.wearable.DataClient
 import com.google.android.gms.wearable.DataEvent
 import com.google.android.gms.wearable.DataEventBuffer
@@ -43,18 +39,19 @@ import com.google.android.gms.wearable.MessageClient
 import com.google.android.gms.wearable.MessageEvent
 import com.google.android.gms.wearable.Wearable
 import com.google.android.horologist.compose.layout.AppScaffold
+import com.google.android.horologist.compose.layout.ColumnItemType
 import com.google.android.horologist.compose.layout.ResponsiveTimeText
+import com.google.android.horologist.compose.layout.rememberResponsiveColumnPadding
 import org.koin.android.ext.android.getKoin
 import org.koin.android.ext.android.inject
 import java.nio.charset.StandardCharsets
 
 
 class MainActivity : ComponentActivity(), MessageClient.OnMessageReceivedListener,
-    DataClient.OnDataChangedListener{
+    DataClient.OnDataChangedListener {
 
 
-
-        private val wearableConnectionRepository by inject<WearableConnectionRepository>()
+    private val wearableConnectionRepository by inject<WearableConnectionRepository>()
 
     private var onDataChanged by mutableStateOf("emp")
 
@@ -82,9 +79,6 @@ class MainActivity : ComponentActivity(), MessageClient.OnMessageReceivedListene
     }
 
 
-
-
-
     private val TAG_MESSAGE_RECEIVED = "receive1"
     private val APP_OPEN_WEARABLE_PAYLOAD_PATH = "/APP_OPEN_WEARABLE_PAYLOAD"
 
@@ -104,11 +98,84 @@ class MainActivity : ComponentActivity(), MessageClient.OnMessageReceivedListene
 
     private var messagelogTextView by mutableStateOf("")
 
+    // Implementation of one of the screens in the navigation
+    @Composable
+    fun MessageDetail(id: String) {
+        // .. Screen level content goes here
+        val scrollState = rememberTransformingLazyColumnState()
+
+        val padding = rememberResponsiveColumnPadding(
+            first = ColumnItemType.BodyText
+        )
+
+        ScreenScaffold(
+            scrollState = scrollState,
+            contentPadding = padding
+        ) { scaffoldPaddingValues ->
+            // Screen content goes here
+            // [START_EXCLUDE]
+            TransformingLazyColumn(
+                state = scrollState,
+                contentPadding = scaffoldPaddingValues
+            ) {
+                item {
+                    Text(
+                        text = id,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.fillMaxSize()
+                    )
+                }
+            }
+            // [END_EXCLUDE]
+            // [END android_wear_navigation]
+        }
+    }
+
+    @Composable
+    fun MessageList(onMessageClick: (String) -> Unit) {
+        val scrollState = rememberTransformingLazyColumnState()
+
+        val padding = rememberResponsiveColumnPadding(
+            first = ColumnItemType.ListHeader,
+            last = ColumnItemType.Button
+        )
+
+        ScreenScaffold(scrollState = scrollState, contentPadding = padding) { contentPadding ->
+            TransformingLazyColumn(
+                state = scrollState,
+                contentPadding = contentPadding
+            ) {
+                item {
+                    ListHeader() {
+                        Text(text = "message_list")
+                    }
+                }
+                item {
+                    Button(
+                        onClick = { onMessageClick("message1") },
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text(text = "Message 1")
+                    }
+                }
+                item {
+                    Button(
+                        onClick = { onMessageClick("message2") },
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text(text = "Message 2")
+                    }
+                }
+            }
+        }
+    }
+
+    private val viewModel by viewModels<MainViewModel>()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val t = intent.getParcelableExtra<WorkoutDataModel>("fhjkd")
 
-        Log.d("sgkffdv", "onCreate -> ${t.toString()}")
+        viewModel.setWorkout(intent.getParcelableExtra<WorkoutDataModel>(getString(R.string.workout_model_extra)))
 
 
         // TODO remove with Service with wakelock and foreground vibration
@@ -116,61 +183,96 @@ class MainActivity : ComponentActivity(), MessageClient.OnMessageReceivedListene
 
         setContent {
             GymTimerAppTheme {
-                ScalingLazyColumn(
-//                    autoCentering = AutoCenteringParams(itemIndex = state.currentExerciseIndex),
-                    modifier = Modifier.fillMaxSize(),
-//                    verticalArrangement = Arrangement.spacedBy(space = 16.dp, alignment = Alignment.Bottom)
-                ) {
+                val navController = rememberSwipeDismissableNavController()
 
-                    item {
-                        Text("on - ${wearableConnectionRepository.messageSharedFlow.collectAsStateWithLifecycle(WearableConnectionRepository.Message.Empty).value}")
+
+
+//                MainScreen(onFinishWidgetClick = ::finishAffinity)
+
+                AppScaffold(
+                    timeText = {
+                        ResponsiveTimeText(
+                            timeTextStyle = TimeTextDefaults.timeTextStyle(
+                                color = androidx.wear.compose.material3.MaterialTheme.colorScheme.primary
+                            )
+                        )
                     }
-
-//                    item {
-//                        Text("messagelogTextView - $messagelogTextView")
-//                    }
-//                    item {
-//                        Button(
-//                            onClick = {
-//                                if(mobileDeviceConnected) {
-//                                    val nodeId: String = messageEvent?.sourceNodeId!!
-//                                    // Set the data of the message to be the bytes of the Uri.
-//                                    val payload: ByteArray =
-//                                        "messagecontentEditText".toByteArray()
-//
-//                                    // Send the rpc
-//                                    // Instantiates clients without member variables, as clients are inexpensive to
-//                                    // create. (They are cached and shared between GoogleApi instances.)
-//                                    val sendMessageTask =
-//                                        Wearable.getMessageClient(this@MainActivity)
-//                                            .sendMessage(nodeId, MESSAGE_ITEM_RECEIVED_PATH, payload)
-//
-////                                    binding.deviceconnectionStatusTv.visibility = View.GONE
-//
-//                                    sendMessageTask.addOnCompleteListener {
-//                                        if (it.isSuccessful) {
-//                                            Log.d("send1", "Message sent successfully")
-//                                            val sbTemp = StringBuilder()
-//                                            sbTemp.append("\n")
-//                                            sbTemp.append("messagecontentEditText")
-//                                            sbTemp.append(" (Sent to mobile)")
-//                                            Log.d("receive1", " $sbTemp")
-//                                            messagelogTextView = buildString {
-//                                                append(messagelogTextView)
-//                                                append(sbTemp)
-//                                            }
-//
-//                                        } else {
-//                                            Log.d("send1", "Message failed.")
-//                                        }
-//                                    }
-//                                }
-//                            }
-//                        ) {
-//                            Text("sendmessageButton")
+                ) {
+//                    SwipeDismissableNavHost(
+//                        navController = navController,
+//                        startDestination = "message_list"
+//                    ) {
+//                        composable("message_list") {
+//                            MessageList(onMessageClick = { id ->
+//                                navController.navigate("message_detail/$id")
+//                            })
+//                        }
+//                        composable("message_detail/{id}") {
+//                            MessageDetail(id = it.arguments?.getString("id")!!)
 //                        }
 //                    }
+
+                    MainScreen(
+                        Modifier.fillMaxSize(),
+                        onFinishWidgetClick = ::finishAffinity
+                    )
                 }
+
+//                ScalingLazyColumn(
+////                    autoCentering = AutoCenteringParams(itemIndex = state.currentExerciseIndex),
+//                    modifier = Modifier.fillMaxSize(),
+////                    verticalArrangement = Arrangement.spacedBy(space = 16.dp, alignment = Alignment.Bottom)
+//                ) {
+//
+//                    item {
+//                        Text("on - ${wearableConnectionRepository.messageSharedFlow.collectAsStateWithLifecycle(WearableConnectionRepository.Message.Empty).value}")
+//                    }
+//
+////                    item {
+////                        Text("messagelogTextView - $messagelogTextView")
+////                    }
+////                    item {
+////                        Button(
+////                            onClick = {
+////                                if(mobileDeviceConnected) {
+////                                    val nodeId: String = messageEvent?.sourceNodeId!!
+////                                    // Set the data of the message to be the bytes of the Uri.
+////                                    val payload: ByteArray =
+////                                        "messagecontentEditText".toByteArray()
+////
+////                                    // Send the rpc
+////                                    // Instantiates clients without member variables, as clients are inexpensive to
+////                                    // create. (They are cached and shared between GoogleApi instances.)
+////                                    val sendMessageTask =
+////                                        Wearable.getMessageClient(this@MainActivity)
+////                                            .sendMessage(nodeId, MESSAGE_ITEM_RECEIVED_PATH, payload)
+////
+//////                                    binding.deviceconnectionStatusTv.visibility = View.GONE
+////
+////                                    sendMessageTask.addOnCompleteListener {
+////                                        if (it.isSuccessful) {
+////                                            Log.d("send1", "Message sent successfully")
+////                                            val sbTemp = StringBuilder()
+////                                            sbTemp.append("\n")
+////                                            sbTemp.append("messagecontentEditText")
+////                                            sbTemp.append(" (Sent to mobile)")
+////                                            Log.d("receive1", " $sbTemp")
+////                                            messagelogTextView = buildString {
+////                                                append(messagelogTextView)
+////                                                append(sbTemp)
+////                                            }
+////
+////                                        } else {
+////                                            Log.d("send1", "Message failed.")
+////                                        }
+////                                    }
+////                                }
+////                            }
+////                        ) {
+////                            Text("sendmessageButton")
+////                        }
+////                    }
+//                }
 //                AppScaffold(
 //                    timeText = {
 //                        ResponsiveTimeText(
@@ -289,7 +391,7 @@ class MainActivity : ComponentActivity(), MessageClient.OnMessageReceivedListene
 
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
-        val t = intent.getParcelableExtra<WorkoutDataModel>("fhjkd")
+        val t = intent.getParcelableExtra<WorkoutDataModel>(getString(R.string.workout_model_extra))
         Log.d("sgkffdv", "onNewIntent -> ${t.toString()}")
     }
 

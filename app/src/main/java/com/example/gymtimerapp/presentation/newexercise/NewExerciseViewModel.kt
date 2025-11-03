@@ -37,4 +37,8 @@ class NewExerciseViewModel(
             navigationManager.navigateUp()
         }
     }
+
+    fun onBackClick() {
+        navigationManager.navigateUp()
+    }
 }

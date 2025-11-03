@@ -219,7 +219,7 @@ class ConnectionRepositoryImpl(context: Context) : MessageClient.OnMessageReceiv
 
 
     companion object {
-        private const val START_ACTIVITY_PATH = "/start-activity"
+        const val START_ACTIVITY_PATH = "/start-activity"
         private const val WEAR_CAPABILITY = "wear"
 
         private const val TAG = "WearableConnectionRepositoryImplTag"

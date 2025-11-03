@@ -6,7 +6,9 @@ import androidx.room.PrimaryKey
 import com.example.presistent.api.ExercisePersistentModel
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import java.time.LocalTime
 import java.util.UUID
+import java.util.concurrent.TimeUnit
 import kotlin.time.Duration.Companion.milliseconds
 
 @Serializable
@@ -43,6 +45,10 @@ internal data class ExerciseEntity(
     @SerialName("uuid")
     @ColumnInfo(name = "uuid")
     val uuid: String,
+
+    @SerialName("date")
+    @ColumnInfo(name = "date")
+    val date: Long
 ) {
     val domainModel: ExercisePersistentModel
         get() = ExercisePersistentModel(
@@ -52,7 +58,7 @@ internal data class ExerciseEntity(
             restDuration = this.restDurationMilliseconds.milliseconds,
             finishWorkRemainingDuration = this.finishWorkRemainingDurationMilliseconds.milliseconds,
             finishRestRemainingDuration = this.finishRestRemainingDurationMilliseconds.milliseconds,
-            uuid = this.uuid
+            uuid = this.uuid,
         )
 
     companion object {
@@ -63,7 +69,8 @@ internal data class ExerciseEntity(
             restDurationMilliseconds = this.restDuration.inWholeMilliseconds,
             finishWorkRemainingDurationMilliseconds = this.finishRestRemainingDuration.inWholeMilliseconds,
             finishRestRemainingDurationMilliseconds = this.finishRestRemainingDuration.inWholeMilliseconds,
-            uuid = this.uuid
+            uuid = this.uuid,
+            date = TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis()),
         )
     }
 }

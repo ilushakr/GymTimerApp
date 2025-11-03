@@ -19,7 +19,7 @@ class DeleteExerciseScreenViewModel(
 
     init {
         viewModelScope.launch {
-            _state.value = persistentWorkoutManager.getByUUID(uuidOfExerciseForDelete).getOrNull()
+            _state.value = persistentWorkoutManager.getExerciseByUUID(uuidOfExerciseForDelete).getOrNull()
         }
     }
 
@@ -30,7 +30,7 @@ class DeleteExerciseScreenViewModel(
     fun onDeleteClick() {
         _state.value?.uuid?.let { uuid ->
             viewModelScope.launch {
-                persistentWorkoutManager.deleteByUUID(uuid)
+                persistentWorkoutManager.deleteExerciseByUUID(uuid)
                 navigationManager.navigateUp()
             }
         } ?: navigationManager.navigateUp()

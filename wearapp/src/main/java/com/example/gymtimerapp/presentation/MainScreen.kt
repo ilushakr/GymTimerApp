@@ -75,7 +75,6 @@ import kotlin.time.Duration.Companion.seconds
 
 @Composable
 internal fun MainScreen(
-    modifier: Modifier = Modifier,
     onFinishWidgetClick: () -> Unit,
 ) {
     WorkoutScreen(onFinishWidgetClick = onFinishWidgetClick)

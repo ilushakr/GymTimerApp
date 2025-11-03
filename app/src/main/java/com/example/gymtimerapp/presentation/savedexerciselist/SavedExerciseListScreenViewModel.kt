@@ -24,7 +24,7 @@ class SavedExerciseListScreenViewModel(
             when(firstEmission){
                 true -> {
                     firstEmission = false
-                    1000
+                    300
                 }
                 false -> 0
             }

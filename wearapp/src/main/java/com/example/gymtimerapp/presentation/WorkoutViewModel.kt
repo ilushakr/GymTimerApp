@@ -132,9 +132,9 @@ internal class WorkoutViewModel(
             .launchIn(viewModelScope)
     }
 
-    fun startWorkout() {
-        currentWorkout = fridayWorkout
-        gymTimer.setModel(fridayWorkout)
+    fun startWorkout(workout: GymTimer.WorkoutModel) {
+        currentWorkout = workout
+        gymTimer.setModel(workout)
         gymTimer.start()
     }
 

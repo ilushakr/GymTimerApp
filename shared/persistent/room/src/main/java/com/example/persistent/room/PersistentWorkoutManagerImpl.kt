@@ -30,14 +30,24 @@ internal class PersistentWorkoutManagerImpl(
             workoutDao.insertWorkout(workoutPersistentModel.toDataModel())
         }
 
-    override suspend fun getByUUID(uuid: String): Result<ExercisePersistentModel> {
+    override suspend fun getExerciseByUUID(uuid: String): Result<ExercisePersistentModel> {
         return dispatch {
-            workoutDao.getAllExercises(uuid).domainModel
+            workoutDao.getExerciseByUUID(uuid).domainModel
         }
     }
 
-    override suspend fun deleteByUUID(uuid: String): Result<Unit> {
-        return dispatch { workoutDao.deleteByUUID(uuid) }
+    override suspend fun deleteExerciseByUUID(uuid: String): Result<Unit> {
+        return dispatch { workoutDao.deleteExerciseByUUID(uuid) }
+    }
+
+    override suspend fun getWorkoutByUUID(uuid: String): Result<WorkoutPersistentModel> {
+        return dispatch {
+            workoutDao.getWorkoutByUUID(uuid).domainModel
+        }
+    }
+
+    override suspend fun deleteWorkoutByUUID(uuid: String): Result<Unit> {
+        return dispatch { workoutDao.deleteWorkoutByUUID(uuid) }
     }
 
     private suspend fun <T> dispatch(block: suspend () -> T) = withContext(Dispatchers.IO) {

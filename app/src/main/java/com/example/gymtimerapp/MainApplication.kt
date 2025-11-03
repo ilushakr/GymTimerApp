@@ -6,11 +6,16 @@ import com.example.gymtimerapp.domain.ConnectionManager
 import com.example.gymtimerapp.navigation.NavigationManager
 import com.example.gymtimerapp.presentation.MainViewModel
 import com.example.gymtimerapp.presentation.deleteexercise.DeleteExerciseScreenViewModel
-import com.example.gymtimerapp.presentation.mainscreen.MainScreenViewModel
+import com.example.gymtimerapp.presentation.deleteworkout.DeleteWorkoutScreenViewModel
+import com.example.gymtimerapp.presentation.navigationhost.NavigationHostViewModel
 import com.example.gymtimerapp.presentation.newexercise.NewExerciseViewModel
 import com.example.gymtimerapp.presentation.newworkout.NewWorkoutViewModel
 import com.example.gymtimerapp.presentation.savedexerciselist.SavedExerciseListScreenViewModel
 import com.example.gymtimerapp.presentation.savedworkoutlist.SavedWorkoutListScreenViewModel
+import com.example.gymtimerapp.presentation.startworkoutcountdownscreen.StartWorkoutCountdownScreenViewModel
+import com.example.gymtimerapp.presentation.tabs.maintabscreen.MainScreenViewModel
+import com.example.gymtimerapp.presentation.tabs.profiletabscreen.ProfileScreenViewModel
+import com.example.gymtimerapp.presentation.tabs.settingstabscreen.SettingsScreenViewModel
 import com.example.persistent.room.PersistentWorkoutManager
 import com.example.shared.connectivity.data.ConnectionRepositoryImpl
 import com.example.shared.connectivity.data.HandheldConnectionRepository
@@ -32,18 +37,29 @@ class MainApplication : Application() {
             androidLogger()
             androidContext(this@MainApplication)
             modules(
-                module { single { GymTimer(StopWatch(get())) } },
-                module { viewModelOf(::NewExerciseViewModel) },
-                module { viewModelOf(::MainViewModel) },
-                module { viewModelOf(::MainScreenViewModel) },
-                module { viewModelOf(::SavedExerciseListScreenViewModel) },
-                module { viewModelOf(::SavedWorkoutListScreenViewModel) },
-                module { viewModelOf(::DeleteExerciseScreenViewModel) },
-                module { viewModelOf(::NewWorkoutViewModel) },
-                module { singleOf(::ConnectionManager) },
-                module { singleOf(::ConnectionRepositoryImpl).bind(HandheldConnectionRepository::class) },
-                module { singleOf(::PersistentWorkoutManager) },
-                module { singleOf(::NavigationManager) },
+                module {
+                    single { GymTimer(StopWatch(get())) }
+                },
+                module {
+                    viewModelOf(::MainViewModel)
+                    viewModelOf(::NavigationHostViewModel)
+                    viewModelOf(::MainScreenViewModel)
+                    viewModelOf(::ProfileScreenViewModel)
+                    viewModelOf(::SettingsScreenViewModel)
+                    viewModelOf(::SavedExerciseListScreenViewModel)
+                    viewModelOf(::SavedWorkoutListScreenViewModel)
+                    viewModelOf(::DeleteExerciseScreenViewModel)
+                    viewModelOf(::DeleteWorkoutScreenViewModel)
+                    viewModelOf(::NewExerciseViewModel)
+                    viewModelOf(::NewWorkoutViewModel)
+                    viewModelOf(::StartWorkoutCountdownScreenViewModel)
+                },
+                module {
+                    singleOf(::ConnectionManager)
+                    singleOf(::ConnectionRepositoryImpl).bind(HandheldConnectionRepository::class)
+                    singleOf(::PersistentWorkoutManager)
+                    singleOf(::NavigationManager)
+                }
             )
         }
     }
